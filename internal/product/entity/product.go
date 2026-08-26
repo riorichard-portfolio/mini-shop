@@ -1,4 +1,4 @@
-package product
+package entity
 
 import "mini-shop/internal/pkg/bizerr"
 
@@ -9,7 +9,7 @@ type Product struct {
 	stock    int
 }
 
-func New(
+func NewProduct(
 	id string,
 	sellerID string,
 	name string,

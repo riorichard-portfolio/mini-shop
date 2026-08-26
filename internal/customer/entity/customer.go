@@ -1,4 +1,4 @@
-package customer
+package entity
 
 type Customer struct {
 	id             string
@@ -6,7 +6,7 @@ type Customer struct {
 	hashedPassword string
 }
 
-func New(
+func NewCustomer(
 	ID string,
 	email string,
 	hashedPassword string,

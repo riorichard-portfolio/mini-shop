@@ -1,4 +1,4 @@
-package seller
+package entity
 
 type Seller struct {
 	id             string
@@ -6,7 +6,7 @@ type Seller struct {
 	hashedPassword string
 }
 
-func New(
+func NewSeller(
 	ID string,
 	email string,
 	hashedPassword string,

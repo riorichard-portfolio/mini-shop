@@ -1,4 +1,4 @@
-package order
+package entity
 
 import (
 	"time"
@@ -13,7 +13,7 @@ type Order struct {
 	createdAt   time.Time
 }
 
-func New(
+func NewOrder(
 	id string,
 	customerID string,
 	productID string,
