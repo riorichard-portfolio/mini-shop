@@ -2,15 +2,15 @@ package seller
 
 import (
 	"context"
+	"errors"
 
 	"github.com/google/uuid"
 
-	"mini-shop/internal/pkg/bizerr"
 	"mini-shop/internal/seller/entity"
 )
 
 type Repo interface {
-	Save(ctx context.Context, seller *entity.Seller) error
+	SaveNew(ctx context.Context, seller *entity.Seller) error
 	IsEmailExists(ctx context.Context, email string) (bool, error)
 	FindByEmail(ctx context.Context, email string) (*entity.Seller, error)
 }
@@ -49,7 +49,7 @@ func (u *Usecase) Register(ctx context.Context, input RegisterInput) (err error)
 		return
 	}
 	if isEmailExists {
-		err = bizerr.New("EMAIL_EXISTS")
+		err = errors.New("EMAIL_EXISTS")
 		return
 	}
 	hashedPassword, err := u.hasher.Hash(input.Password)
@@ -61,7 +61,7 @@ func (u *Usecase) Register(ctx context.Context, input RegisterInput) (err error)
 		input.Email,
 		hashedPassword,
 	)
-	err = u.repo.Save(ctx, seller)
+	err = u.repo.SaveNew(ctx, seller)
 	return
 }
 
@@ -71,7 +71,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (token string, er
 		return
 	}
 	if seller == nil {
-		err = bizerr.New("INVALID_EMAIL")
+		err = errors.New("INVALID_EMAIL")
 		return
 	}
 	isPasswordCorrect, err := u.hasher.Verify(input.Password, seller.HashedPassword())
@@ -79,7 +79,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (token string, er
 		return
 	}
 	if !isPasswordCorrect {
-		err = bizerr.New("INVALID_PASSWORD")
+		err = errors.New("INVALID_PASSWORD")
 		return
 	}
 	token, err = u.tokenProvider.Generate(&TokenPayload{

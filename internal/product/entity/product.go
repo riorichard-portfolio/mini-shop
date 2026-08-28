@@ -1,6 +1,6 @@
 package entity
 
-import "mini-shop/internal/pkg/bizerr"
+import "errors"
 
 type Product struct {
 	id       string
@@ -16,7 +16,7 @@ func NewProduct(
 	stock int,
 ) (*Product, error) {
 	if stock < 0 {
-		return nil, bizerr.New("INVALID_STOCK")
+		return nil, errors.New("INVALID_STOCK")
 	}
 	return &Product{
 		id:       id,
@@ -33,10 +33,10 @@ func (p *Product) Stock() int       { return p.stock }
 
 func (p *Product) DecreaseStock(quantity int) error {
 	if quantity <= 0 {
-		return bizerr.New("INVALID_QUANTITY")
+		return errors.New("INVALID_QUANTITY")
 	}
 	if p.stock < quantity {
-		return bizerr.New("INSUFFICIENT_STOCK")
+		return errors.New("INSUFFICIENT_STOCK")
 	}
 	p.stock -= quantity
 	return nil
