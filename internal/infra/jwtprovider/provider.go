@@ -67,18 +67,18 @@ func (jp *JWTProvider) Verify(tokenStr string) (*seller.TokenPayload, error) {
 		return jp.publicKey, nil
 	})
 	if err != nil {
-		return nil, errors.CombineErrors(err, InvalidSellerToken)
+		return nil, errors.CombineErrors(err, InvalidAccessToken)
 	}
 
 	if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok && jwtToken.Valid {
 		sellerID, ok := claims["seller_id"].(string)
 		if !ok || sellerID == "" {
-			return nil, InvalidSellerToken
+			return nil, InvalidAccessToken
 		}
 		return &seller.TokenPayload{
 			SellerID: sellerID,
 		}, nil
 	}
 
-	return nil, InvalidSellerToken
+	return nil, InvalidAccessToken
 }
