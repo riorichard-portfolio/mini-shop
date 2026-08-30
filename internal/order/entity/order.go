@@ -1,7 +1,6 @@
 package entity
 
 import (
-	"errors"
 	"time"
 )
 
@@ -25,10 +24,10 @@ func NewOrder(
 	status string,
 ) (*Order, error) {
 	if quantity < 1 {
-		return nil, errors.New("INVALID_QUANTITY")
+		return nil, InvalidQuantityErr
 	}
 	if status != "PENDING" && status != "CANCELLED" && status != "COMPLETE" {
-		return nil, errors.New("INVALID_ORDER_STATUS")
+		return nil, InvalidOrderStatusErr
 	}
 	return &Order{
 		id:          id,
