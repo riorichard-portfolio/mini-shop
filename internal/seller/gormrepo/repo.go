@@ -2,9 +2,8 @@ package gormrepo
 
 import (
 	"context"
-	"errors"
-	"fmt"
 
+	"github.com/cockroachdb/errors"
 	"gorm.io/gorm"
 
 	"mini-shop/internal/seller/entity"
@@ -29,7 +28,7 @@ func (gr *GormRepo) SaveNew(ctx context.Context, seller *entity.Seller) error {
 		HashedPassword: seller.HashedPassword(),
 	}).Error
 	if err != nil {
-		return fmt.Errorf("seller.gormrepo.SaveNew: %w", err)
+		return errors.Wrap(err, "failed to create new seller with gorm")
 	}
 	return nil
 }
@@ -42,7 +41,7 @@ func (gr *GormRepo) IsEmailExists(ctx context.Context, email string) (bool, erro
 		Count(&count).Error
 
 	if err != nil {
-		return false, fmt.Errorf("seller.gormrepo.IsEmailExists: %w", err)
+		return false, errors.Wrap(err, "failed to count to check email exists with gorm")
 	}
 	return count > 0, nil
 }
@@ -57,7 +56,7 @@ func (gr *GormRepo) FindByEmail(ctx context.Context, email string) (*entity.Sell
 		return nil, nil
 	}
 	if err != nil {
-		return nil, fmt.Errorf("seller.gormrepo.FindByEmail: %w", err)
+		return nil, errors.Wrap(err, "failed to find first for find by email with gorm")
 	}
 	return entity.NewSeller(
 		sellerData.ID,

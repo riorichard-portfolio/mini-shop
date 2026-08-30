@@ -2,7 +2,6 @@ package seller
 
 import (
 	"context"
-	"errors"
 
 	"github.com/google/uuid"
 
@@ -22,7 +21,7 @@ type Hasher interface {
 
 type TokenProvider interface {
 	Generate(payload *TokenPayload) (string, error)
-	Verify(token string) (TokenPayload, error)
+	Verify(tokenStr string) (*TokenPayload, error)
 }
 
 type Usecase struct {
@@ -49,7 +48,7 @@ func (u *Usecase) Register(ctx context.Context, input RegisterInput) (err error)
 		return
 	}
 	if isEmailExists {
-		err = errors.New("EMAIL_EXISTS")
+		err = EmailExistsErr
 		return
 	}
 	hashedPassword, err := u.hasher.Hash(input.Password)
@@ -71,7 +70,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (token string, er
 		return
 	}
 	if seller == nil {
-		err = errors.New("INVALID_EMAIL")
+		err = InvalidEmailErr
 		return
 	}
 	isPasswordCorrect, err := u.hasher.Verify(input.Password, seller.HashedPassword())
@@ -79,7 +78,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (token string, er
 		return
 	}
 	if !isPasswordCorrect {
-		err = errors.New("INVALID_PASSWORD")
+		err = InvalidPasswordErr
 		return
 	}
 	token, err = u.tokenProvider.Generate(&TokenPayload{

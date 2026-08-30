@@ -1,10 +1,8 @@
 package bcrypthash
 
 import (
-	"errors"
-	"fmt"
-
 	"golang.org/x/crypto/bcrypt"
+	"github.com/cockroachdb/errors"
 )
 
 type BcryptHasher struct{}
@@ -15,7 +13,7 @@ func (bh *BcryptHasher) Hash(password string) (string, error) {
 		bcrypt.DefaultCost,
 	)
 	if err != nil {
-		return "", fmt.Errorf("seller.bcrypthash.Hash: %w", err)
+		return "", errors.Wrap(err, "failed to hash with bcrypt")
 	}
 	return string(hashed), nil
 }
@@ -29,7 +27,7 @@ func (bh *BcryptHasher) Verify(password string, hashedPassword string) (bool, er
 		return false, nil
 	}
 	if err != nil {
-		return false, fmt.Errorf("seller.bcrypthash.Verify: %w", err)
+		return false, errors.Wrap(err, "failed to compare hash with bcrypt")
 	}
 	return true, nil
 }
