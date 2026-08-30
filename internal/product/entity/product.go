@@ -1,7 +1,5 @@
 package entity
 
-import "errors"
-
 type Product struct {
 	id       string
 	sellerID string
@@ -16,7 +14,7 @@ func NewProduct(
 	stock int,
 ) (*Product, error) {
 	if stock < 0 {
-		return nil, errors.New("INVALID_STOCK")
+		return nil, InvalidStockErr
 	}
 	return &Product{
 		id:       id,
@@ -33,10 +31,10 @@ func (p *Product) Stock() int       { return p.stock }
 
 func (p *Product) DecreaseStock(quantity int) error {
 	if quantity <= 0 {
-		return errors.New("INVALID_QUANTITY")
+		return InvalidQuantityErr
 	}
 	if p.stock < quantity {
-		return errors.New("INSUFFICIENT_STOCK")
+		return InsufficientStockErr
 	}
 	p.stock -= quantity
 	return nil
