@@ -42,18 +42,17 @@ func NewUsecase(
 	}
 }
 
-func (u *Usecase) Register(ctx context.Context, input RegisterInput) (err error) {
+func (u *Usecase) Register(ctx context.Context, input RegisterInput) error {
 	isEmailExists, err := u.repo.IsEmailExists(ctx, input.Email)
 	if err != nil {
-		return
+		return err
 	}
 	if isEmailExists {
-		err = EmailExistsErr
-		return
+		return EmailExistsErr
 	}
 	hashedPassword, err := u.hasher.Hash(input.Password)
 	if err != nil {
-		return
+		return err
 	}
 	seller := entity.NewSeller(
 		uuid.NewString(),
@@ -61,28 +60,26 @@ func (u *Usecase) Register(ctx context.Context, input RegisterInput) (err error)
 		hashedPassword,
 	)
 	err = u.repo.SaveNew(ctx, seller)
-	return
+	return err
 }
 
-func (u *Usecase) Login(ctx context.Context, input LoginInput) (token string, err error) {
+func (u *Usecase) Login(ctx context.Context, input LoginInput) (string, error) {
 	seller, err := u.repo.FindByEmail(ctx, input.Email)
 	if err != nil {
-		return
+		return "", err
 	}
 	if seller == nil {
-		err = InvalidEmailErr
-		return
+		return "", InvalidEmailErr
 	}
 	isPasswordCorrect, err := u.hasher.Verify(input.Password, seller.HashedPassword())
 	if err != nil {
-		return
+		return "", err
 	}
 	if !isPasswordCorrect {
-		err = InvalidPasswordErr
-		return
+		return "", InvalidPasswordErr
 	}
-	token, err = u.tokenProvider.Generate(&TokenPayload{
+	token, err := u.tokenProvider.Generate(&TokenPayload{
 		SellerID: seller.ID(),
 	})
-	return
+	return token, err
 }
