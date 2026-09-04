@@ -22,7 +22,7 @@ func NewRepo(
 	}
 }
 
-func (gr *GormRepo) SaveNew(ctx context.Context, product *entity.Product) error {
+func (gr *GormRepo) SaveNew(ctx context.Context, product entity.Product) error {
 	err := gr.db.WithContext(ctx).Create(&ProductGorm{
 		ID:       product.ID(),
 		SellerID: product.SellerID(),
@@ -35,7 +35,7 @@ func (gr *GormRepo) SaveNew(ctx context.Context, product *entity.Product) error 
 	return nil
 }
 
-func (gr *GormRepo) FindMany(ctx context.Context, query *product.FindManyQuery) ([]entity.Product, error) {
+func (gr *GormRepo) FindMany(ctx context.Context, query product.FindManyQuery) ([]entity.Product, error) {
 	var productsData []ProductGorm
 	err := gr.db.WithContext(ctx).
 		Model(&ProductGorm{}).
@@ -56,7 +56,7 @@ func (gr *GormRepo) FindMany(ctx context.Context, query *product.FindManyQuery) 
 		if err != nil {
 			continue
 		}
-		productEntities = append(productEntities, *productEntity)
+		productEntities = append(productEntities, productEntity)
 	}
 	return productEntities, nil
 }

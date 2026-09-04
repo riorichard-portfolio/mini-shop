@@ -9,9 +9,9 @@ import (
 )
 
 type Repo interface {
-	SaveNew(ctx context.Context, customer *entity.Customer) error
+	SaveNew(ctx context.Context, customer entity.Customer) error
 	IsEmailExists(ctx context.Context, email string) (bool, error)
-	FindByEmail(ctx context.Context, email string) (*entity.Customer, error)
+	FindByEmail(ctx context.Context, email string) (entity.Customer, error)
 }
 
 type Hasher interface {
@@ -20,7 +20,7 @@ type Hasher interface {
 }
 
 type TokenProvider interface {
-	Generate(payload *TokenPayload) (string, error)
+	Generate(payload TokenPayload) (string, error)
 	Verify(token string) (TokenPayload, error)
 }
 
@@ -42,18 +42,17 @@ func NewUsecase(
 	}
 }
 
-func (u *Usecase) Register(ctx context.Context, input RegisterInput) (err error) {
+func (u *Usecase) Register(ctx context.Context, input RegisterInput) error {
 	isEmailExists, err := u.repo.IsEmailExists(ctx, input.Email)
 	if err != nil {
-		return
+		return err
 	}
 	if isEmailExists {
-		err = EmailExistsErr
-		return
+		return EmailExistsErr
 	}
 	hashedPassword, err := u.hasher.Hash(input.Password)
 	if err != nil {
-		return
+		return err
 	}
 	customer := entity.NewCustomer(
 		uuid.NewString(),
@@ -61,28 +60,23 @@ func (u *Usecase) Register(ctx context.Context, input RegisterInput) (err error)
 		hashedPassword,
 	)
 	err = u.repo.SaveNew(ctx, customer)
-	return
+	return err
 }
 
-func (u *Usecase) Login(ctx context.Context, input LoginInput) (token string, err error) {
+func (u *Usecase) Login(ctx context.Context, input LoginInput) (string, error) {
 	customer, err := u.repo.FindByEmail(ctx, input.Email)
 	if err != nil {
-		return
-	}
-	if customer == nil {
-		err = InvalidEmailErr
-		return
+		return "", err
 	}
 	isPasswordCorrect, err := u.hasher.Verify(input.Password, customer.HashedPassword())
 	if err != nil {
-		return
+		return "", err
 	}
 	if !isPasswordCorrect {
-		err = InvalidPasswordErr
-		return
+		return "", InvalidPasswordErr
 	}
-	token, err = u.tokenProvider.Generate(&TokenPayload{
+	token, err := u.tokenProvider.Generate(TokenPayload{
 		CustomerID: customer.ID(),
 	})
-	return
+	return token, err
 }

@@ -9,8 +9,8 @@ import (
 )
 
 type Repo interface {
-	SaveNew(ctx context.Context, product *entity.Product) error
-	FindMany(ctx context.Context, query *FindManyQuery) ([]entity.Product, error)
+	SaveNew(ctx context.Context, product entity.Product) error
+	FindMany(ctx context.Context, query FindManyQuery) ([]entity.Product, error)
 }
 
 type Usecase struct {
@@ -40,7 +40,7 @@ func (u *Usecase) AddNewProduct(ctx context.Context, input AddNewProductInput) e
 }
 
 func (u *Usecase) BrowseProducts(ctx context.Context, input BrowseProductsInput) ([]ProductItem, error) {
-	productEntities, err := u.repo.FindMany(ctx, &FindManyQuery{
+	productEntities, err := u.repo.FindMany(ctx, FindManyQuery{
 		Limit:  input.Limit,
 		Offset: input.Offset,
 	})

@@ -22,14 +22,14 @@ func NewOrder(
 	quantity int,
 	createdAt time.Time,
 	status string,
-) (*Order, error) {
+) (Order, error) {
 	if quantity < 1 {
-		return nil, InvalidQuantityErr
+		return Order{}, InvalidQuantityErr
 	}
 	if status != "PENDING" && status != "CANCELLED" && status != "COMPLETE" {
-		return nil, InvalidOrderStatusErr
+		return Order{}, InvalidOrderStatusErr
 	}
-	return &Order{
+	return Order{
 		id:          id,
 		customerID:  customerID,
 		productID:   productID,

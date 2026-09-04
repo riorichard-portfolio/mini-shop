@@ -12,11 +12,11 @@ func NewProduct(
 	sellerID string,
 	name string,
 	stock int,
-) (*Product, error) {
+) (Product, error) {
 	if stock < 0 {
-		return nil, InvalidStockErr
+		return Product{}, InvalidStockErr
 	}
-	return &Product{
+	return Product{
 		id:       id,
 		sellerID: sellerID,
 		name:     name,

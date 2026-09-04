@@ -11,14 +11,14 @@ import (
 )
 
 type Repo interface {
-	SaveNew(ctx context.Context, order *entity.Order) error
-	FindById(ctx context.Context, id string) (*entity.Order, error)
+	SaveNew(ctx context.Context, order entity.Order) error
+	FindById(ctx context.Context, id string) (entity.Order, error)
 	FindBySellerId(ctx context.Context, sellerId string) ([]entity.Order, error)
-	UpdateById(ctx context.Context, order *entity.Order) error
+	UpdateById(ctx context.Context, order entity.Order) error
 }
 
 type ProductSvc interface {
-	FindByID(ctx context.Context, id string) (*productSvc.FindByIDOutput, error)
+	FindByID(ctx context.Context, id string) (productSvc.FindByIDOutput, error)
 	DecreaseStock(ctx context.Context, id string, qty int) error
 }
 
@@ -52,13 +52,10 @@ func NewUsecase(
 	}
 }
 
-func (u *Usecase) MakeOrder(ctx context.Context, input *MakeOrderInput) error {
+func (u *Usecase) MakeOrder(ctx context.Context, input MakeOrderInput) error {
 	product, err := u.productSvc.FindByID(ctx, input.ProductID)
 	if err != nil {
 		return err
-	}
-	if product == nil {
-		return ProductNotFoundErr
 	}
 	order, err := entity.NewOrder(
 		uuid.NewString(),

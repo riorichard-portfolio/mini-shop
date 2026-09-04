@@ -10,8 +10,8 @@ func NewSeller(
 	ID string,
 	email string,
 	hashedPassword string,
-) *Seller {
-	return &Seller{
+) Seller {
+	return Seller{
 		id:             ID,
 		email:          email,
 		hashedPassword: hashedPassword,

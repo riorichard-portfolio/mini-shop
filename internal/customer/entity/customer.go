@@ -10,14 +10,14 @@ func NewCustomer(
 	ID string,
 	email string,
 	hashedPassword string,
-) *Customer {
-	return &Customer{
+) Customer {
+	return Customer{
 		id:             ID,
 		email:          email,
 		hashedPassword: hashedPassword,
 	}
 }
 
-func (s *Customer) ID() string             { return s.id }
-func (s *Customer) Email() string          { return s.email }
-func (s *Customer) HashedPassword() string { return s.hashedPassword }
+func (c *Customer) ID() string             { return c.id }
+func (c *Customer) Email() string          { return c.email }
+func (c *Customer) HashedPassword() string { return c.hashedPassword }

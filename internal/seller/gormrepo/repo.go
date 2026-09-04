@@ -21,7 +21,7 @@ func NewRepo(
 	}
 }
 
-func (gr *GormRepo) SaveNew(ctx context.Context, seller *entity.Seller) error {
+func (gr *GormRepo) SaveNew(ctx context.Context, seller entity.Seller) error {
 	err := gr.db.WithContext(ctx).Create(&SellerGorm{
 		ID:             seller.ID(),
 		Email:          seller.Email(),
@@ -46,17 +46,17 @@ func (gr *GormRepo) IsEmailExists(ctx context.Context, email string) (bool, erro
 	return count > 0, nil
 }
 
-func (gr *GormRepo) FindByEmail(ctx context.Context, email string) (*entity.Seller, error) {
+func (gr *GormRepo) FindByEmail(ctx context.Context, email string) (entity.Seller, error) {
 	var sellerData SellerGorm
 	err := gr.db.WithContext(ctx).
 		Model(&SellerGorm{}).
 		Where("email = ?", email).
 		First(&sellerData).Error
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, nil
+		return entity.Seller{}, SellerNotFoundErr
 	}
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to find first for find by email with gorm")
+		return entity.Seller{}, errors.Wrap(err, "failed to find first for find by email with gorm")
 	}
 	return entity.NewSeller(
 		sellerData.ID,

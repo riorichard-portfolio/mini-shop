@@ -9,9 +9,9 @@ import (
 )
 
 type Repo interface {
-	SaveNew(ctx context.Context, seller *entity.Seller) error
+	SaveNew(ctx context.Context, seller entity.Seller) error
 	IsEmailExists(ctx context.Context, email string) (bool, error)
-	FindByEmail(ctx context.Context, email string) (*entity.Seller, error)
+	FindByEmail(ctx context.Context, email string) (entity.Seller, error)
 }
 
 type Hasher interface {
@@ -20,8 +20,8 @@ type Hasher interface {
 }
 
 type TokenProvider interface {
-	Generate(payload *TokenPayload) (string, error)
-	Verify(tokenStr string) (*TokenPayload, error)
+	Generate(payload TokenPayload) (string, error)
+	Verify(tokenStr string) (TokenPayload, error)
 }
 
 type Usecase struct {
@@ -68,9 +68,6 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if seller == nil {
-		return "", InvalidEmailErr
-	}
 	isPasswordCorrect, err := u.hasher.Verify(input.Password, seller.HashedPassword())
 	if err != nil {
 		return "", err
@@ -78,7 +75,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (string, error) {
 	if !isPasswordCorrect {
 		return "", InvalidPasswordErr
 	}
-	token, err := u.tokenProvider.Generate(&TokenPayload{
+	token, err := u.tokenProvider.Generate(TokenPayload{
 		SellerID: seller.ID(),
 	})
 	return token, err

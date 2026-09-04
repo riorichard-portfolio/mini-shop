@@ -44,7 +44,7 @@ func NewProvider(
 	}, nil
 }
 
-func (jp *JWTProvider) Generate(payload *seller.TokenPayload) (string, error) {
+func (jp *JWTProvider) Generate(payload seller.TokenPayload) (string, error) {
 	claims := jwt.MapClaims{
 		"seller_id": payload.SellerID,
 		"exp":       time.Now().Add(time.Hour * 24).Unix(),
@@ -59,7 +59,7 @@ func (jp *JWTProvider) Generate(payload *seller.TokenPayload) (string, error) {
 	return signedToken, nil
 }
 
-func (jp *JWTProvider) Verify(tokenStr string) (*seller.TokenPayload, error) {
+func (jp *JWTProvider) Verify(tokenStr string) (seller.TokenPayload, error) {
 	jwtToken, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.New("invalid signing method in jwt token")
@@ -67,18 +67,18 @@ func (jp *JWTProvider) Verify(tokenStr string) (*seller.TokenPayload, error) {
 		return jp.publicKey, nil
 	})
 	if err != nil {
-		return nil, errors.CombineErrors(err, InvalidAccessToken)
+		return seller.TokenPayload{}, errors.CombineErrors(err, InvalidSellerToken)
 	}
 
 	if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok && jwtToken.Valid {
 		sellerID, ok := claims["seller_id"].(string)
 		if !ok || sellerID == "" {
-			return nil, InvalidAccessToken
+			return seller.TokenPayload{}, InvalidSellerToken
 		}
-		return &seller.TokenPayload{
+		return seller.TokenPayload{
 			SellerID: sellerID,
 		}, nil
 	}
 
-	return nil, InvalidAccessToken
+	return seller.TokenPayload{}, InvalidSellerToken
 }
