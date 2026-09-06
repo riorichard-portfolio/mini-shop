@@ -10,3 +10,9 @@ type CompleteOrderInput struct {
 	OrderID string
 	SellerID string
 }
+
+type FindAllBySellerIdQuery struct {
+	SellerID string
+	Limit int
+	Offset int
+}

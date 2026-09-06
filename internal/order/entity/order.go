@@ -53,6 +53,7 @@ func (o *Order) SellerID() string      { return o.sellerID }
 func (o *Order) ProductName() string   { return o.productName }
 func (o *Order) Quantity() int         { return o.quantity }
 func (o *Order) CreatedAt() time.Time  { return o.createdAt }
+func (o *Order) CurrentStatus() string { return o.currentStatus }
 
 func (o *Order) StatusTo() (string, error) {
 	if o.statusTo == "" {

@@ -13,8 +13,8 @@ import (
 type Repo interface {
 	SaveNew(ctx context.Context, order entity.Order) error
 	FindById(ctx context.Context, id string) (entity.Order, error)
-	FindBySellerId(ctx context.Context, sellerId string) ([]entity.Order, error)
-	UpdateById(ctx context.Context, order entity.Order) error
+	FindAllBySellerId(ctx context.Context, query FindAllBySellerIdQuery) ([]entity.Order, error)
+	UpdateStatus(ctx context.Context, order entity.Order) (bool, error)
 }
 
 type ProductSvc interface {
@@ -65,7 +65,7 @@ func (u *Usecase) MakeOrder(ctx context.Context, input MakeOrderInput) error {
 		product.Name,
 		input.Quantity,
 		time.Now(),
-		"PENDING",
+		entity.PendingStatus,
 	)
 	if err != nil {
 		return err
@@ -88,9 +88,12 @@ func (u *Usecase) CompleteOrder(ctx context.Context, input CompleteOrderInput) e
 	if err != nil {
 		return err
 	}
-	err = tx.Repo().UpdateById(ctx, order)
+	isSuccess, err := tx.Repo().UpdateStatus(ctx, order)
 	if err != nil {
 		return err
+	}
+	if !isSuccess {
+		return InconsistentStatusChangesErr
 	}
 	err = tx.ProductSvc().DecreaseStock(ctx, productSvc.DecreaseStockInput{
 		ID:       order.ProductID(),
