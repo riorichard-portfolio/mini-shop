@@ -19,7 +19,7 @@ type Repo interface {
 
 type ProductSvc interface {
 	FindByID(ctx context.Context, id string) (productSvc.FindByIDOutput, error)
-	DecreaseStock(ctx context.Context, id string, qty int) error
+	DecreaseStock(ctx context.Context, input productSvc.DecreaseStockInput) error
 }
 
 type Transaction interface {
@@ -61,6 +61,7 @@ func (u *Usecase) MakeOrder(ctx context.Context, input MakeOrderInput) error {
 		uuid.NewString(),
 		input.CustomerID,
 		input.ProductID,
+		product.SellerID,
 		product.Name,
 		input.Quantity,
 		time.Now(),
@@ -70,5 +71,35 @@ func (u *Usecase) MakeOrder(ctx context.Context, input MakeOrderInput) error {
 		return err
 	}
 	err = u.repo.SaveNew(ctx, order)
+	return err
+}
+
+func (u *Usecase) CompleteOrder(ctx context.Context, input CompleteOrderInput) error {
+	order, err := u.repo.FindById(ctx, input.OrderID)
+	if err != nil {
+		return err
+	}
+	tx, err := u.txManager.New(ctx)
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	err = order.Complete(input.SellerID)
+	if err != nil {
+		return err
+	}
+	err = tx.Repo().UpdateById(ctx, order)
+	if err != nil {
+		return err
+	}
+	err = tx.ProductSvc().DecreaseStock(ctx, productSvc.DecreaseStockInput{
+		ID:       order.ProductID(),
+		Quantity: order.Quantity(),
+		SellerID: input.SellerID,
+	})
+	if err != nil {
+		return err
+	}
+	err = tx.Commit()
 	return err
 }

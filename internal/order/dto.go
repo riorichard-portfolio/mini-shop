@@ -5,3 +5,8 @@ type MakeOrderInput struct {
 	ProductID   string
 	Quantity    int
 }
+
+type CompleteOrderInput struct {
+	OrderID string
+	SellerID string
+}

@@ -7,7 +7,7 @@ import (
 )
 
 type Repo interface {
-	DecreaseStockByID(ctx context.Context, id string, qty int) (bool, error)
+	UpdateProductStock(ctx context.Context, product entity.Product) (bool, error)
 	FindByID(ctx context.Context, id string) (entity.Product, error)
 }
 
@@ -29,21 +29,22 @@ func (s *Service) FindByID(ctx context.Context, id string) (FindByIDOutput, erro
 		return FindByIDOutput{}, err
 	}
 	return FindByIDOutput{
-		ID:   product.ID(),
-		Name: product.Name(),
+		ID:       product.ID(),
+		Name:     product.Name(),
+		SellerID: product.SellerID(),
 	}, nil
 }
 
-func (s *Service) DecreaseStock(ctx context.Context, id string, qty int) error {
-	product, err := s.repo.FindByID(ctx, id)
+func (s *Service) DecreaseStock(ctx context.Context, input DecreaseStockInput) error {
+	product, err := s.repo.FindByID(ctx, input.ID)
 	if err != nil {
 		return err
 	}
-	err = product.DecreaseStock(qty)
+	err = product.DecreaseStock(input.Quantity, input.SellerID)
 	if err != nil {
 		return err
 	}
-	isSuccess, err := s.repo.DecreaseStockByID(ctx, id, qty)
+	isSuccess, err := s.repo.UpdateProductStock(ctx, product)
 	if err != nil {
 		return err
 	}

@@ -27,7 +27,7 @@ func (gr *GormRepo) SaveNew(ctx context.Context, product entity.Product) error {
 		ID:       product.ID(),
 		SellerID: product.SellerID(),
 		Name:     product.Name(),
-		Stock:    product.Stock(),
+		Stock:    0,
 	}).Error
 	if err != nil {
 		return errors.Wrap(err, "failed to create new product with gorm")
@@ -51,7 +51,6 @@ func (gr *GormRepo) FindMany(ctx context.Context, query product.FindManyQuery) (
 			product.ID,
 			product.SellerID,
 			product.Name,
-			product.Stock,
 		)
 		if err != nil {
 			continue
@@ -59,4 +58,34 @@ func (gr *GormRepo) FindMany(ctx context.Context, query product.FindManyQuery) (
 		productEntities = append(productEntities, productEntity)
 	}
 	return productEntities, nil
+}
+
+func (gr *GormRepo) UpdateProductStock(ctx context.Context, product entity.Product) (bool, error) {
+	result := gr.db.WithContext(ctx).
+		Model(&ProductGorm{}).
+		Where("id = ?", product.ID()).
+		Where("stock >= ?", product.StockToDecr()).
+		Update("stock", gorm.Expr("stock - ?", product.StockToDecr()))
+	if result.Error != nil {
+		return false, errors.Wrap(result.Error, "failed to decrease stock by id product with gorm")
+	}
+	return result.RowsAffected > 0, nil
+}
+
+func (gr *GormRepo) FindByID(ctx context.Context, id string) (entity.Product, error) {
+	var productData ProductGorm
+	err := gr.db.WithContext(ctx).
+		Where("id = ?", id).
+		Take(&productData).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return entity.Product{}, ProductNotFoundErr
+	}
+	if err != nil {
+		return entity.Product{}, errors.Wrap(err, "failed to find by id product with gorm")
+	}
+	return entity.NewProduct(
+		productData.ID,
+		productData.SellerID,
+		productData.Name,
+	)
 }

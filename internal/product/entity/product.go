@@ -1,41 +1,37 @@
 package entity
 
 type Product struct {
-	id       string
-	sellerID string
-	name     string
-	stock    int
+	id          string
+	sellerID    string
+	name        string
+	stockToDecr int
 }
 
 func NewProduct(
 	id string,
 	sellerID string,
 	name string,
-	stock int,
 ) (Product, error) {
-	if stock < 0 {
-		return Product{}, InvalidStockErr
-	}
 	return Product{
-		id:       id,
-		sellerID: sellerID,
-		name:     name,
-		stock:    stock,
+		id:          id,
+		sellerID:    sellerID,
+		name:        name,
+		stockToDecr: 0,
 	}, nil
 }
 
 func (p *Product) ID() string       { return p.id }
 func (p *Product) SellerID() string { return p.sellerID }
 func (p *Product) Name() string     { return p.name }
-func (p *Product) Stock() int       { return p.stock }
+func (p *Product) StockToDecr() int { return p.stockToDecr }
 
-func (p *Product) DecreaseStock(quantity int) error {
+func (p *Product) DecreaseStock(quantity int, sellerID string) error {
+	if p.sellerID != sellerID {
+		return UnauthorizedSellerErr
+	}
 	if quantity <= 0 {
 		return InvalidQuantityErr
 	}
-	if p.stock < quantity {
-		return InsufficientStockErr
-	}
-	p.stock -= quantity
+	p.stockToDecr += quantity
 	return nil
 }

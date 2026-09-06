@@ -30,7 +30,6 @@ func (u *Usecase) AddNewProduct(ctx context.Context, input AddNewProductInput) e
 		uuid.NewString(),
 		input.SellerID,
 		input.Name,
-		input.Stock,
 	)
 	if err != nil {
 		return err
@@ -50,9 +49,8 @@ func (u *Usecase) BrowseProducts(ctx context.Context, input BrowseProductsInput)
 	products := make([]ProductItem, 0, len(productEntities))
 	for _, product := range productEntities {
 		products = append(products, ProductItem{
-			ID:    product.ID(),
-			Name:  product.Name(),
-			Stock: product.Stock(),
+			ID:   product.ID(),
+			Name: product.Name(),
 		})
 	}
 	return products, nil

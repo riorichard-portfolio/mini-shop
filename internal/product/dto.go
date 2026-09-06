@@ -19,5 +19,4 @@ type BrowseProductsInput struct {
 type ProductItem struct {
 	ID       string
 	Name     string
-	Stock    int
 }

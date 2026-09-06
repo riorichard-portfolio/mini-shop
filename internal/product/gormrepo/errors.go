@@ -1,4 +1,4 @@
-package order
+package gormrepo
 
 import "errors"
 
