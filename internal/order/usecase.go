@@ -74,6 +74,26 @@ func (u *Usecase) MakeOrder(ctx context.Context, input MakeOrderInput) error {
 	return err
 }
 
+func (u *Usecase) OrderList(ctx context.Context, input OrderListInput) ([]OrderListItem, error) {
+	orders, err := u.repo.FindAllBySellerId(ctx, FindAllBySellerIdQuery{
+		SellerID: input.SellerID,
+		Limit:    input.Limit,
+		Offset:   input.Offset,
+	})
+	if err != nil {
+		return nil, err
+	}
+	res := make([]OrderListItem, 0, len(orders))
+	for _, order := range orders {
+		res = append(res, OrderListItem{
+			OrderID:     order.ID(),
+			ProductName: order.ProductName(),
+			Quantity:    order.Quantity(),
+		})
+	}
+	return res, nil
+}
+
 func (u *Usecase) CompleteOrder(ctx context.Context, input CompleteOrderInput) error {
 	order, err := u.repo.FindById(ctx, input.OrderID)
 	if err != nil {
@@ -105,4 +125,23 @@ func (u *Usecase) CompleteOrder(ctx context.Context, input CompleteOrderInput) e
 	}
 	err = tx.Commit()
 	return err
+}
+
+func (u *Usecase) CancelOrder(ctx context.Context, input CancelOrderInput) error {
+	order, err := u.repo.FindById(ctx, input.OrderID)
+	if err != nil {
+		return err
+	}
+	err = order.Cancel(input.SellerID)
+	if err != nil {
+		return err
+	}
+	isSuccess, err := u.repo.UpdateStatus(ctx, order)
+	if err != nil {
+		return err
+	}
+	if !isSuccess {
+		return InconsistentStatusChangesErr
+	}
+	return nil
 }
