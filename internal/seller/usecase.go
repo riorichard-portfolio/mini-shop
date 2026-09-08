@@ -21,7 +21,6 @@ type Hasher interface {
 
 type TokenProvider interface {
 	Generate(payload TokenPayload) (string, error)
-	Verify(tokenStr string) (TokenPayload, error)
 }
 
 type Usecase struct {
