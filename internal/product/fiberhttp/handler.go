@@ -3,7 +3,7 @@ package fiberhttp
 import (
 	"github.com/gofiber/fiber/v3"
 
-	"mini-shop/internal/helper/fiberhelper"
+	"mini-shop/internal/pkg/helper/fiberhelper"
 	"mini-shop/internal/product"
 )
 
