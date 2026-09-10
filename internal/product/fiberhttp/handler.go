@@ -54,12 +54,12 @@ func (h *Handler) BrowseProducts(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	resp := make(BrowseProductsResp, 0, len(res))
+	data := make(BrowseProductsResp, 0, len(res))
 	for _, item := range res {
-		resp = append(resp, ProductItem{
+		data = append(data, ProductItem{
 			ID:   item.ID,
 			Name: item.Name,
 		})
 	}
-	return c.Status(fiber.StatusOK).JSON(resp)
+	return c.Status(fiber.StatusOK).JSON(data)
 }
