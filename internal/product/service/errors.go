@@ -1,8 +1,8 @@
 package service
 
-import "errors"
+import "mini-shop/internal/pkg/err/bizerr"
 
 var(
-	InsufficientStockErr = errors.New("INSUFFICIENT_STOCK")
-	InvalidProductErr = errors.New("INVALID_PRODUCT")
+	InsufficientStockErr = bizerr.BadRequestErr("INSUFFICIENT_STOCK")
+	InvalidProductErr = bizerr.BadRequestErr("INVALID_PRODUCT")
 )

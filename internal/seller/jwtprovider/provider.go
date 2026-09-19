@@ -62,7 +62,7 @@ func (jp *JWTProvider) Generate(payload seller.TokenPayload) (string, error) {
 func (jp *JWTProvider) Verify(tokenStr string) (seller.TokenPayload, error) {
 	jwtToken, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
-			return nil, errors.New("invalid signing method in jwt token")
+			return nil, InvalidSigningMethodErr
 		}
 		return jp.publicKey, nil
 	})

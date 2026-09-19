@@ -1,7 +1,7 @@
 package gormrepo
 
-import "errors"
+import "mini-shop/internal/pkg/err/bizerr"
 
 var(
-	SellerNotFoundErr = errors.New("SELLER_NOT_FOUND")
+	SellerNotFoundErr = bizerr.NotFoundErr("SELLER_NOT_FOUND")
 )

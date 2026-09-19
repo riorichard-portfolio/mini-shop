@@ -1,8 +1,8 @@
 package entity
 
-import "errors"
+import "mini-shop/internal/pkg/err/bizerr"
 
 var (
-	InvalidQuantityErr   = errors.New("INVALID_QUANTITY")
-	UnauthorizedSellerErr = errors.New("UNAUTHORIZED_SELLER")
+	InvalidQuantityErr   = bizerr.BadRequestErr("INVALID_QUANTITY")
+	UnauthorizedSellerErr = bizerr.ForbiddenErr("UNAUTHORIZED_SELLER")
 )

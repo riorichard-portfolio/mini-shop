@@ -1,7 +1,7 @@
 package order
 
-import "errors"
+import "mini-shop/internal/pkg/err/bizerr"
 
 var(
-	InconsistentStatusChangesErr = errors.New("INCONSISTENT_STATUS_CHANGES")
+	InconsistentStatusChangesErr = bizerr.BadRequestErr("INCONSISTENT_STATUS_CHANGES")
 )

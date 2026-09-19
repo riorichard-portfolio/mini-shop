@@ -1,9 +1,9 @@
 package seller
 
-import "errors"
+import "mini-shop/internal/pkg/err/bizerr"
 
 var (
-	EmailExistsErr     = errors.New("EMAIL_EXISTS")
-	InvalidEmailErr    = errors.New("INVALID_EMAIL")
-	InvalidPasswordErr = errors.New("INVALID_PASSWORD")
+	EmailExistsErr     = bizerr.BadRequestErr("EMAIL_EXISTS")
+	InvalidEmailErr    = bizerr.BadRequestErr("INVALID_EMAIL")
+	InvalidPasswordErr = bizerr.BadRequestErr("INVALID_PASSWORD")
 )

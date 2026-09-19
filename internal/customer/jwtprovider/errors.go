@@ -1,9 +1,8 @@
 package jwtprovider
 
-import (
-	"errors"
-)
+import "mini-shop/internal/pkg/err/bizerr"
 
 var (
-	InvalidCustomerToken = errors.New("INVALID_CUSTOMER_TOKEN")
+	InvalidCustomerToken = bizerr.UnauthorizedErr("INVALID_CUSTOMER_TOKEN")
+	InvalidSigningMethodErr = bizerr.UnauthorizedErr("INVALID_SIGNING_METHOD")
 )
