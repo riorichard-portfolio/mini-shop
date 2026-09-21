@@ -1,17 +1,16 @@
 package fiberhttp
 
 import (
-	"errors"
+	"fmt"
+	"log/slog"
 
-	errorwrapper "github.com/cockroachdb/errors"
+	"mini-shop/internal/pkg/err/bizerr"
+
+	"github.com/cockroachdb/errors"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
+	"github.com/iancoleman/strcase"
 )
-
-type FieldErrorResponse struct {
-	Field   string `json:"field"`
-	Message string `json:"message"`
-}
 
 func ErrHandler(c fiber.Ctx, err error) error {
 	if err == nil {
@@ -19,32 +18,37 @@ func ErrHandler(c fiber.Ctx, err error) error {
 	}
 	var ve validator.ValidationErrors
 	if errors.As(err, &ve) {
-		errorList := make([]FieldErrorResponse, 0, len(ve))
+		errorMap := make(map[string]string, len(ve))
 		for _, errItem := range ve {
-			errorList = append(errorList, FieldErrorResponse{
-				Field:   errItem.Field(),
-				Message: getValidationMsg(errItem),
-			})
+			snakeCaseField := strcase.ToSnake(errItem.Field())
+			if errItem.Param() != "" {
+				errorMap[snakeCaseField] = errItem.Tag() + ":" + errItem.Param()
+			} else {
+				errorMap[snakeCaseField] = errItem.Tag()
+			}
 		}
-		return c.Status(fiber.StatusBadRequest).JSON(errorList)
+		return c.Status(fiber.StatusBadRequest).JSON(ErrorResponse{
+			Message: "invalid request",
+			Errors:  errorMap,
+		})
 	}
 	var fiberErr *fiber.Error
 	if errors.As(err, &fiberErr) {
-		return c.Status(fiberErr.Code).JSON(fiberErr.Message)
+		return c.Status(fiberErr.Code).JSON(ErrorResponse{
+			Message: fiberErr.Message,
+		})
 	}
-	if errorwrapper.Unwrap(err) != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(err.Error())
+	var bizErr *bizerr.BizErr
+	if errors.As(err, &bizErr) {
+		return c.Status(bizErr.Code).JSON(ErrorResponse{
+			Message: bizErr.Message,
+		})
 	}
-	return c.Status(fiber.StatusPreconditionFailed).JSON(err.Error())
-}
-
-func getValidationMsg(fe validator.FieldError) string {
-	switch fe.Tag() {
-	case "required":
-		return "field required"
-	case "email":
-		return "must be an email"
-	default:
-		return "invalid input"
-	}
+	slog.Error("unhandled internal server error",
+		"path", c.Path(),
+		"method", c.Method(),
+		"error", err.Error(),
+		"stacktrace", fmt.Sprintf("%+v", err),
+	)
+	return c.Status(fiber.StatusInternalServerError).JSON(InternalServerError)
 }

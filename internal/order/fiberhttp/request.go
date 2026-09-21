@@ -6,8 +6,8 @@ type MakeOrderReq struct {
 }
 
 type OrderListReq struct{
-	Limit    int `json:"limit" validate:"required"`
-	Offset   int `json:"offset" validate:"required"`
+	Limit    int `query:"limit" validate:"required"`
+	Offset   int `query:"offset" validate:"gte=0"`
 }
 
 type CompleteOrderReq struct {
