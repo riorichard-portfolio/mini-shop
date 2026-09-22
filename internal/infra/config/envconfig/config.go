@@ -39,7 +39,7 @@ func NewConfig(
 		},
 		AppConfig: config.AppConfig{
 			Port: envcfg.Port,
-			TimoutDur: envcfg.TimeoutDur,
+			TimeoutDur: envcfg.TimeoutDur,
 		},
 	}, nil
 }

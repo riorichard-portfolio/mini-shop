@@ -8,7 +8,7 @@ type PostgreConfig struct {
 
 type AppConfig struct {
 	Port      int
-	TimoutDur time.Duration
+	TimeoutDur time.Duration
 }
 
 type Config struct {
