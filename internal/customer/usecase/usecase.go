@@ -1,4 +1,4 @@
-package customer
+package usecase
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 
 	"mini-shop/internal/customer/entity"
+	"mini-shop/internal/customer/dto"
 )
 
 type Repo interface {
@@ -20,8 +21,8 @@ type Hasher interface {
 }
 
 type TokenProvider interface {
-	Generate(payload TokenPayload) (string, error)
-	Verify(token string) (TokenPayload, error)
+	Generate(payload dto.TokenPayload) (string, error)
+	Verify(token string) (dto.TokenPayload, error)
 }
 
 type Usecase struct {
@@ -42,7 +43,7 @@ func NewUsecase(
 	}
 }
 
-func (u *Usecase) Register(ctx context.Context, input RegisterInput) error {
+func (u *Usecase) Register(ctx context.Context, input dto.RegisterInput) error {
 	isEmailExists, err := u.repo.IsEmailExists(ctx, input.Email)
 	if err != nil {
 		return err
@@ -63,7 +64,7 @@ func (u *Usecase) Register(ctx context.Context, input RegisterInput) error {
 	return err
 }
 
-func (u *Usecase) Login(ctx context.Context, input LoginInput) (string, error) {
+func (u *Usecase) Login(ctx context.Context, input dto.LoginInput) (string, error) {
 	customer, err := u.repo.FindByEmail(ctx, input.Email)
 	if err != nil {
 		return "", err
@@ -75,7 +76,7 @@ func (u *Usecase) Login(ctx context.Context, input LoginInput) (string, error) {
 	if !isPasswordCorrect {
 		return "", InvalidPasswordErr
 	}
-	token, err := u.tokenProvider.Generate(TokenPayload{
+	token, err := u.tokenProvider.Generate(dto.TokenPayload{
 		CustomerID: customer.ID(),
 	})
 	return token, err

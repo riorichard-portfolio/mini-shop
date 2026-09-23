@@ -1,8 +1,4 @@
-package customer
-
-type TokenPayload struct {
-	CustomerID string
-}
+package dto
 
 type RegisterInput struct {
 	Email    string

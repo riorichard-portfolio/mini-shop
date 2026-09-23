@@ -7,7 +7,7 @@ import (
 
 	"github.com/cockroachdb/errors"
 	"github.com/golang-jwt/jwt/v5"
-	"mini-shop/internal/customer"
+	"mini-shop/internal/customer/dto"
 )
 
 type JWTProvider struct {
@@ -44,7 +44,7 @@ func NewProvider(
 	}, nil
 }
 
-func (jp *JWTProvider) Generate(payload customer.TokenPayload) (string, error) {
+func (jp *JWTProvider) Generate(payload dto.TokenPayload) (string, error) {
 	claims := jwt.MapClaims{
 		"customer_id": payload.CustomerID,
 		"exp":       time.Now().Add(time.Hour * 24).Unix(),
@@ -59,7 +59,7 @@ func (jp *JWTProvider) Generate(payload customer.TokenPayload) (string, error) {
 	return signedToken, nil
 }
 
-func (jp *JWTProvider) Verify(tokenStr string) (customer.TokenPayload, error) {
+func (jp *JWTProvider) Verify(tokenStr string) (dto.TokenPayload, error) {
 	jwtToken, err := jwt.Parse(tokenStr, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, InvalidSigningMethodErr
@@ -67,18 +67,18 @@ func (jp *JWTProvider) Verify(tokenStr string) (customer.TokenPayload, error) {
 		return jp.publicKey, nil
 	})
 	if err != nil {
-		return customer.TokenPayload{}, errors.CombineErrors(err, InvalidCustomerToken)
+		return dto.TokenPayload{}, errors.CombineErrors(err, InvalidCustomerToken)
 	}
 
 	if claims, ok := jwtToken.Claims.(jwt.MapClaims); ok && jwtToken.Valid {
 		customerID, ok := claims["customer_id"].(string)
 		if !ok || customerID == "" {
-			return customer.TokenPayload{}, InvalidCustomerToken
+			return dto.TokenPayload{}, InvalidCustomerToken
 		}
-		return customer.TokenPayload{
+		return dto.TokenPayload{
 			CustomerID: customerID,
 		}, nil
 	}
 
-	return customer.TokenPayload{}, InvalidCustomerToken
+	return dto.TokenPayload{}, InvalidCustomerToken
 }
