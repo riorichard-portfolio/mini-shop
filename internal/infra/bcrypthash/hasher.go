@@ -1,11 +1,15 @@
 package bcrypthash
 
 import (
-	"golang.org/x/crypto/bcrypt"
 	"github.com/cockroachdb/errors"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type BcryptHasher struct{}
+
+func NewBcryptHasher() *BcryptHasher {
+	return &BcryptHasher{}
+}
 
 func (bh *BcryptHasher) Hash(password string) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword(
