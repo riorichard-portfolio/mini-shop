@@ -1,8 +1,8 @@
-package order
+package product
 
 import (
-	"mini-shop/internal/order/fiberhttp"
-	"mini-shop/internal/order/usecase"
+	"mini-shop/internal/product/fiberhttp"
+	"mini-shop/internal/product/usecase"
 
 	"github.com/gofiber/fiber/v3"
 )

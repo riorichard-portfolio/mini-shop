@@ -4,15 +4,16 @@ import (
 	"github.com/gofiber/fiber/v3"
 
 	"mini-shop/internal/pkg/helper/fiberhelper"
-	"mini-shop/internal/product"
+	"mini-shop/internal/product/usecase"
+	"mini-shop/internal/product/dto"
 )
 
 type Handler struct {
-	usc *product.Usecase
+	usc *usecase.Usecase
 }
 
 func NewHandler(
-	usc *product.Usecase,
+	usc *usecase.Usecase,
 ) *Handler {
 	return &Handler{
 		usc: usc,
@@ -29,7 +30,7 @@ func (h *Handler) AddNewProduct(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	err = h.usc.AddNewProduct(c.Context(), product.AddNewProductInput{
+	err = h.usc.AddNewProduct(c.Context(), dto.AddNewProductInput{
 		SellerID: sellerID,
 		Name:     req.Name,
 		Stock:    req.Stock,
@@ -47,7 +48,7 @@ func (h *Handler) BrowseProducts(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	res, err := h.usc.BrowseProducts(c.Context(), product.BrowseProductsInput{
+	res, err := h.usc.BrowseProducts(c.Context(), dto.BrowseProductsInput{
 		Limit:  req.Limit,
 		Offset: req.Offset,
 	})

@@ -1,4 +1,4 @@
-package product
+package dto
 
 type FindManyQuery struct {
 	Limit  int

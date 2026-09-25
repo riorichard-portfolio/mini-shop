@@ -1,4 +1,4 @@
-package product
+package usecase
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 	"github.com/google/uuid"
 
 	"mini-shop/internal/product/entity"
+	"mini-shop/internal/product/dto"
 )
 
 type Repo interface {
 	SaveNew(ctx context.Context, product entity.Product) error
-	FindMany(ctx context.Context, query FindManyQuery) ([]entity.Product, error)
+	FindMany(ctx context.Context, query dto.FindManyQuery) ([]entity.Product, error)
 }
 
 type Usecase struct {
@@ -25,7 +26,7 @@ func NewUsecase(
 	}
 }
 
-func (u *Usecase) AddNewProduct(ctx context.Context, input AddNewProductInput) error {
+func (u *Usecase) AddNewProduct(ctx context.Context, input dto.AddNewProductInput) error {
 	newProduct, err := entity.NewProduct(
 		uuid.NewString(),
 		input.SellerID,
@@ -38,17 +39,17 @@ func (u *Usecase) AddNewProduct(ctx context.Context, input AddNewProductInput) e
 	return err
 }
 
-func (u *Usecase) BrowseProducts(ctx context.Context, input BrowseProductsInput) ([]ProductItem, error) {
-	productEntities, err := u.repo.FindMany(ctx, FindManyQuery{
+func (u *Usecase) BrowseProducts(ctx context.Context, input dto.BrowseProductsInput) ([]dto.ProductItem, error) {
+	productEntities, err := u.repo.FindMany(ctx, dto.FindManyQuery{
 		Limit:  input.Limit,
 		Offset: input.Offset,
 	})
 	if err != nil {
 		return nil, err
 	}
-	products := make([]ProductItem, 0, len(productEntities))
+	products := make([]dto.ProductItem, 0, len(productEntities))
 	for _, product := range productEntities {
-		products = append(products, ProductItem{
+		products = append(products, dto.ProductItem{
 			ID:   product.ID(),
 			Name: product.Name(),
 		})

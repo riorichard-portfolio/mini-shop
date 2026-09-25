@@ -6,7 +6,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"gorm.io/gorm"
 
-	"mini-shop/internal/product"
+	"mini-shop/internal/product/dto"
 	"mini-shop/internal/product/entity"
 )
 
@@ -35,7 +35,7 @@ func (gr *GormRepo) SaveNew(ctx context.Context, product entity.Product) error {
 	return nil
 }
 
-func (gr *GormRepo) FindMany(ctx context.Context, query product.FindManyQuery) ([]entity.Product, error) {
+func (gr *GormRepo) FindMany(ctx context.Context, query dto.FindManyQuery) ([]entity.Product, error) {
 	var productsData []ProductGorm
 	err := gr.db.WithContext(ctx).
 		Model(&ProductGorm{}).
