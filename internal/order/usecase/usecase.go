@@ -1,4 +1,4 @@
-package order
+package usecase
 
 import (
 	"context"
@@ -7,13 +7,14 @@ import (
 	"github.com/google/uuid"
 
 	"mini-shop/internal/order/entity"
+	"mini-shop/internal/order/dto"
 	productSvc "mini-shop/internal/product/service"
 )
 
 type Repo interface {
 	SaveNew(ctx context.Context, order entity.Order) error
 	FindById(ctx context.Context, id string) (entity.Order, error)
-	FindAllBySellerId(ctx context.Context, query FindAllBySellerIdQuery) ([]entity.Order, error)
+	FindAllBySellerId(ctx context.Context, query dto.FindAllBySellerIdQuery) ([]entity.Order, error)
 	UpdateStatus(ctx context.Context, order entity.Order) (bool, error)
 }
 
@@ -52,7 +53,7 @@ func NewUsecase(
 	}
 }
 
-func (u *Usecase) MakeOrder(ctx context.Context, input MakeOrderInput) error {
+func (u *Usecase) MakeOrder(ctx context.Context, input dto.MakeOrderInput) error {
 	product, err := u.productSvc.FindByID(ctx, input.ProductID)
 	if err != nil {
 		return err
@@ -74,8 +75,8 @@ func (u *Usecase) MakeOrder(ctx context.Context, input MakeOrderInput) error {
 	return err
 }
 
-func (u *Usecase) OrderList(ctx context.Context, input OrderListInput) ([]OrderListItem, error) {
-	orders, err := u.repo.FindAllBySellerId(ctx, FindAllBySellerIdQuery{
+func (u *Usecase) OrderList(ctx context.Context, input dto.OrderListInput) ([]dto.OrderListItem, error) {
+	orders, err := u.repo.FindAllBySellerId(ctx, dto.FindAllBySellerIdQuery{
 		SellerID: input.SellerID,
 		Limit:    input.Limit,
 		Offset:   input.Offset,
@@ -83,9 +84,9 @@ func (u *Usecase) OrderList(ctx context.Context, input OrderListInput) ([]OrderL
 	if err != nil {
 		return nil, err
 	}
-	res := make([]OrderListItem, 0, len(orders))
+	res := make([]dto.OrderListItem, 0, len(orders))
 	for _, order := range orders {
-		res = append(res, OrderListItem{
+		res = append(res, dto.OrderListItem{
 			OrderID:     order.ID(),
 			ProductName: order.ProductName(),
 			Quantity:    order.Quantity(),
@@ -94,7 +95,7 @@ func (u *Usecase) OrderList(ctx context.Context, input OrderListInput) ([]OrderL
 	return res, nil
 }
 
-func (u *Usecase) CompleteOrder(ctx context.Context, input CompleteOrderInput) error {
+func (u *Usecase) CompleteOrder(ctx context.Context, input dto.CompleteOrderInput) error {
 	order, err := u.repo.FindById(ctx, input.OrderID)
 	if err != nil {
 		return err
@@ -127,7 +128,7 @@ func (u *Usecase) CompleteOrder(ctx context.Context, input CompleteOrderInput) e
 	return err
 }
 
-func (u *Usecase) CancelOrder(ctx context.Context, input CancelOrderInput) error {
+func (u *Usecase) CancelOrder(ctx context.Context, input dto.CancelOrderInput) error {
 	order, err := u.repo.FindById(ctx, input.OrderID)
 	if err != nil {
 		return err

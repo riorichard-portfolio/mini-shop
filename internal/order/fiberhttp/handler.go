@@ -3,16 +3,17 @@ package fiberhttp
 import (
 	"github.com/gofiber/fiber/v3"
 
-	"mini-shop/internal/order"
+	"mini-shop/internal/order/dto"
+	"mini-shop/internal/order/usecase"
 	"mini-shop/internal/pkg/helper/fiberhelper"
 )
 
 type Handler struct {
-	usc *order.Usecase
+	usc *usecase.Usecase
 }
 
 func NewHandler(
-	usc *order.Usecase,
+	usc *usecase.Usecase,
 ) *Handler {
 	return &Handler{
 		usc: usc,
@@ -29,7 +30,7 @@ func (h *Handler) MakeOrder(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	err = h.usc.MakeOrder(c.Context(), order.MakeOrderInput{
+	err = h.usc.MakeOrder(c.Context(), dto.MakeOrderInput{
 		CustomerID: customerID,
 		ProductID:  req.ProductID,
 		Quantity:   req.Quantity,
@@ -51,7 +52,7 @@ func (h *Handler) OrderList(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	res, err := h.usc.OrderList(c.Context(), order.OrderListInput{
+	res, err := h.usc.OrderList(c.Context(), dto.OrderListInput{
 		SellerID: sellerID,
 		Limit:    req.Limit,
 		Offset:   req.Offset,
@@ -81,7 +82,7 @@ func (h *Handler) CompleteOrder(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	err = h.usc.CompleteOrder(c.Context(), order.CompleteOrderInput{
+	err = h.usc.CompleteOrder(c.Context(), dto.CompleteOrderInput{
 		OrderID:  req.OrderID,
 		SellerID: sellerID,
 	})
@@ -101,7 +102,7 @@ func (h *Handler) CancelOrder(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	err = h.usc.CancelOrder(c.Context(), order.CancelOrderInput{
+	err = h.usc.CancelOrder(c.Context(), dto.CancelOrderInput{
 		OrderID:  req.OrderID,
 		SellerID: sellerID,
 	})

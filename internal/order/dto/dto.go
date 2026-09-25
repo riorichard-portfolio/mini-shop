@@ -1,4 +1,4 @@
-package order
+package dto
 
 type MakeOrderInput struct {
 	CustomerID string
@@ -9,12 +9,6 @@ type MakeOrderInput struct {
 type CompleteOrderInput struct {
 	OrderID  string
 	SellerID string
-}
-
-type FindAllBySellerIdQuery struct {
-	SellerID string
-	Limit    int
-	Offset   int
 }
 
 type OrderListInput struct {

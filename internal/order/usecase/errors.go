@@ -1,4 +1,4 @@
-package order
+package usecase
 
 import "mini-shop/internal/pkg/err/bizerr"
 

@@ -6,7 +6,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"gorm.io/gorm"
 
-	"mini-shop/internal/order"
+	"mini-shop/internal/order/dto"
 	"mini-shop/internal/order/entity"
 )
 
@@ -63,7 +63,7 @@ func (gr *GormRepo) FindById(ctx context.Context, id string) (entity.Order, erro
 	)
 }
 
-func (gr *GormRepo) FindAllBySellerId(ctx context.Context, query order.FindAllBySellerIdQuery) ([]entity.Order, error) {
+func (gr *GormRepo) FindAllBySellerId(ctx context.Context, query dto.FindAllBySellerIdQuery) ([]entity.Order, error) {
 	var ordersData []OrderGorm
 	err := gr.db.WithContext(ctx).
 		Where("seller_id = ?", query.SellerID).

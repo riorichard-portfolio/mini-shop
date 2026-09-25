@@ -6,6 +6,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"gorm.io/gorm"
 
+	"mini-shop/internal/order/usecase"
 	productRepo "mini-shop/internal/product/gormrepo"
 	productSvc "mini-shop/internal/product/service"
 )
@@ -17,11 +18,11 @@ type TxProcess struct {
 	isDone     bool
 }
 
-func (tp *TxProcess) Repo() *GormRepo {
+func (tp *TxProcess) Repo() usecase.Repo {
 	return tp.repo
 }
 
-func (tp *TxProcess) ProductSvc() *productSvc.Service {
+func (tp *TxProcess) ProductSvc() usecase.ProductSvc {
 	return tp.productSvc
 }
 
@@ -59,7 +60,7 @@ func NewTxManager(
 	}
 }
 
-func (tm *TxManager) New(ctx context.Context) (*TxProcess, error) {
+func (tm *TxManager) New(ctx context.Context) (usecase.Transaction, error) {
 	tx := tm.db.WithContext(ctx).Begin()
 	if tx.Error != nil {
 		return nil, errors.Wrap(tx.Error, "failed to begin transaction process order with gorm")
