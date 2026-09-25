@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func ErrHandler(
+func NewErrHandler(
 	translator ut.Translator,
 ) func(c fiber.Ctx, err error) error {
 	return func(c fiber.Ctx, err error) error {
