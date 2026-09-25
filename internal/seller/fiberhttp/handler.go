@@ -3,15 +3,16 @@ package fiberhttp
 import (
 	"github.com/gofiber/fiber/v3"
 
-	"mini-shop/internal/seller"
+	"mini-shop/internal/seller/usecase"
+	"mini-shop/internal/seller/dto"
 )
 
 type Handler struct {
-	usc *seller.Usecase
+	usc *usecase.Usecase
 }
 
 func NewHandler(
-	usc *seller.Usecase,
+	usc *usecase.Usecase,
 ) *Handler {
 	return &Handler{
 		usc: usc,
@@ -24,7 +25,7 @@ func (h *Handler) Login(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	res, err := h.usc.Login(c.Context(), seller.LoginInput{
+	res, err := h.usc.Login(c.Context(), dto.LoginInput{
 		Email:    req.Email,
 		Password: req.Password,
 	})
@@ -42,7 +43,7 @@ func (h *Handler) Register(c fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	err = h.usc.Register(c.Context(), seller.RegisterInput{
+	err = h.usc.Register(c.Context(), dto.RegisterInput{
 		Email:    req.Email,
 		Password: req.Password,
 	})

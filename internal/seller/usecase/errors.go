@@ -1,4 +1,4 @@
-package seller
+package usecase
 
 import "mini-shop/internal/pkg/err/bizerr"
 
