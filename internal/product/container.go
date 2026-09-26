@@ -10,20 +10,27 @@ import (
 
 type Container struct {
 	GormRepo *gormrepo.GormRepo
-	Usecase  *usecase.Usecase
 	Service  *service.Service
+
+	usc *usecase.Usecase
+}
+
+func (c *Container) Usecase() *usecase.Usecase {
+	if c.usc != nil {
+		return c.usc
+	}
+	c.usc = usecase.NewUsecase(c.GormRepo)
+	return c.usc
 }
 
 func NewContainer(
 	db *gorm.DB,
 ) *Container {
 	gormRepo := gormrepo.NewRepo(db)
-	usc := usecase.NewUsecase(gormRepo)
 	svc := service.NewService(gormRepo)
 
 	return &Container{
 		GormRepo: gormRepo,
-		Usecase:  usc,
 		Service:  svc,
 	}
 }

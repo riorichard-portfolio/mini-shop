@@ -15,7 +15,22 @@ type Container struct {
 	GormRepo    *gormrepo.GormRepo
 	JWTProvider *jwtprovider.JWTProvider
 	Middleware  *fiberhttp.Middleware
-	Usecase     *usecase.Usecase
+
+	usc *usecase.Usecase
+}
+
+func (c *Container) Usecase(
+	bcryptHasher *bcrypthash.BcryptHasher,
+) *usecase.Usecase {
+	if c.usc != nil {
+		return c.usc
+	}
+	c.usc = usecase.NewUsecase(
+		c.GormRepo,
+		bcryptHasher,
+		c.JWTProvider,
+	)
+	return c.usc
 }
 
 func NewContainer(
@@ -35,15 +50,9 @@ func NewContainer(
 	middleware := fiberhttp.NewMiddleware(
 		jwtProvider,
 	)
-	usc := usecase.NewUsecase(
-		gormRepo,
-		bcryptHasher,
-		jwtProvider,
-	)
 	return &Container{
 		GormRepo:    gormRepo,
 		JWTProvider: jwtProvider,
 		Middleware:  middleware,
-		Usecase:     usc,
 	}, nil
 }

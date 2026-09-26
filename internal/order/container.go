@@ -8,23 +8,33 @@ import (
 )
 
 type Container struct {
-	GormRepo *gormrepo.GormRepo
-	Usecase  *usecase.Usecase
+	GormRepo      *gormrepo.GormRepo
+	gormTxmanager *gormrepo.TxManager
+
+	usc *usecase.Usecase
+}
+
+func (c *Container) Usecase(
+	productSvc usecase.ProductSvc,
+) *usecase.Usecase {
+	if c.usc != nil {
+		return c.usc
+	}
+	c.usc = usecase.NewUsecase(
+		c.GormRepo,
+		productSvc,
+		c.gormTxmanager,
+	)
+	return c.usc
 }
 
 func NewContainer(
 	db *gorm.DB,
-	productSvc usecase.ProductSvc,
 ) *Container {
 	gormRepo := gormrepo.NewRepo(db)
 	gormTxmanager := gormrepo.NewTxManager(db)
-	usc := usecase.NewUsecase(
-		gormRepo,
-		productSvc,
-		gormTxmanager,
-	)
 	return &Container{
-		GormRepo: gormRepo,
-		Usecase:  usc,
+		GormRepo:      gormRepo,
+		gormTxmanager: gormTxmanager,
 	}
 }

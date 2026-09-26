@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func RegisterApi(
+func RegisterAPI(
 	app *fiber.App,
 	usc *usecase.Usecase,
 	sellerAuth fiber.Handler,
